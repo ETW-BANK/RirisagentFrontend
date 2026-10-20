@@ -36,16 +36,16 @@ The client follows the OpenAPI document at
 `https://ririsagent.runasp.net/swagger/v1/swagger.json`:
 
 - Chat uses `POST /api/Agent/chat` with `question`, optional `conversationId`, and
-  optional `documentId`.
+  optional `documentId` and `subject`. Automatic subject and all-relevant-document
+  selections omit those optional fields.
 - The API exposes upload as `POST /api/Agent/upload` with a multipart `file`
   field. Document upload is not part of this chat interface.
-- Swagger currently has no subject property, document-list endpoint, or documented
-  success-response schema. A direct API request currently returns `answer`,
+- Swagger currently has no document-list endpoint or documented success-response
+  schema. A direct API request currently returns `answer`,
   `conversationId`, and `citations` (`documentId`, `fileName`, `pageNumber`, `text`);
   the client parses those observed fields but Swagger should be updated to guarantee
-  them. The subject inputs are therefore local guidance only
-  and are not sent to the API. An optional existing document UUID can be supplied
-  manually; the frontend does not invent document IDs.
+  them. An optional existing document UUID can be supplied manually; the frontend
+  does not invent document IDs.
 - The backend's current OPTIONS response does not allow browser cross-origin
   requests. The Vite proxy handles local development. A production frontend hosted
   on a different origin requires the API to allow that origin via CORS.

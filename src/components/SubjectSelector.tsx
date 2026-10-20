@@ -1,4 +1,10 @@
-const COMMON_SUBJECTS = ['math', 'physics', 'chemistry', 'biology']
+const COMMON_SUBJECTS = [
+  { value: 'math', label: 'Math' },
+  { value: 'physics', label: 'Physics' },
+  { value: 'chemistry', label: 'Chemistry' },
+  { value: 'biology', label: 'Biology' },
+  { value: 'history', label: 'History' },
+]
 
 interface SubjectSelectorProps {
   value: string
@@ -9,17 +15,17 @@ export function SubjectSelector({ value, onChange }: SubjectSelectorProps) {
   return (
     <label className="field-label">
       Subject
-      <input
+      <select
         aria-label="Subject"
-        list="subject-options"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder="e.g. math"
-      />
-      <datalist id="subject-options">
-        {COMMON_SUBJECTS.map((subject) => <option key={subject} value={subject} />)}
-      </datalist>
-      <span className="field-hint">Match this to the subject used for your study materials.</span>
+        value={value ?? ''}
+        onChange={(event) => onChange(event.target.value || '')}
+      >
+        <option value="">Automatic</option>
+        {COMMON_SUBJECTS.map((subject) => (
+          <option key={subject.value} value={subject.value}>{subject.label}</option>
+        ))}
+      </select>
+      <span className="field-hint">Automatic lets StudentAssist detect a subject from your question.</span>
     </label>
   )
 }

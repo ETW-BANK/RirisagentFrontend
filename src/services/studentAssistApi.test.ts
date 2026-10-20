@@ -6,7 +6,7 @@ describe('StudentAssist API contract', () => {
     vi.unstubAllGlobals()
   })
 
-  it('posts only the fields documented for chat', async () => {
+  it('posts only explicitly provided fields documented for chat', async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response('A plain-text answer.', {
         status: 200,
@@ -36,6 +36,49 @@ describe('StudentAssist API contract', () => {
       }),
     )
     expect(JSON.parse(fetchMock.mock.calls[0][1].body as string)).not.toHaveProperty('subject')
+  })
+
+  it('omits subject, documentId, and conversationId for an automatic new question', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response('{"answer":"Sets are collections.","citations":[]}', {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    await chatWithAssistant(
+      { question: 'Explain facts about sets.' },
+      new AbortController().signal,
+    )
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/Agent/chat',
+      expect.objectContaining({
+        method: 'POST',
+        body: '{"question":"Explain facts about sets."}',
+      }),
+    )
+  })
+
+  it('includes an explicit subject in the Swagger chat request body', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response('{"answer":"Sets are collections.","citations":[]}', {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    await chatWithAssistant(
+      { question: 'Explain facts about sets.', subject: 'math' },
+      new AbortController().signal,
+    )
+
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body as string)).toEqual({
+      question: 'Explain facts about sets.',
+      subject: 'math',
+    })
   })
 
   it('maps rate-limit responses to a helpful message', async () => {

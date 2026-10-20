@@ -8,7 +8,7 @@ import { SubjectSelector } from './SubjectSelector'
 interface ChatWindowProps {
   conversation: Conversation
   busy: boolean
-  onSend: (question: string) => void
+  onSend: (question: string, subject: string, documentId: string) => void
   onRetry: (question: string) => void
   onSubjectChange: (subject: string) => void
   onDocumentChange: (documentId: string) => void
@@ -33,7 +33,7 @@ export function ChatWindow({
   const send = (event?: FormEvent) => {
     event?.preventDefault()
     if (!question.trim() || busy) return
-    onSend(question)
+    onSend(question, conversation.subject ?? '', conversation.documentId)
     setQuestion('')
   }
 
@@ -49,13 +49,13 @@ export function ChatWindow({
       <header className="chat-header">
         <div className="header-copy">
           <span className="eyebrow">
-            {conversation.subject || 'YOUR STUDY SPACE'}
+            {conversation.subject || 'AUTOMATIC SUBJECT'}
             {conversation.documentId && ` · ${conversation.documentId}`}
           </span>
           <h1>{conversation.documentId ? 'Document chat' : 'Ask StudentAssist'}</h1>
         </div>
         <div className="header-fields">
-          <SubjectSelector value={conversation.subject} onChange={onSubjectChange} />
+          <SubjectSelector value={conversation.subject ?? ''} onChange={onSubjectChange} />
           <DocumentSelector value={conversation.documentId} onChange={onDocumentChange} />
         </div>
       </header>

@@ -4,6 +4,7 @@
 
 button,
 input,
+select,
 textarea {
   font: inherit;
 }
@@ -14,6 +15,7 @@ button {
 
 button:focus-visible,
 input:focus-visible,
+select:focus-visible,
 textarea:focus-visible {
   outline: 3px solid #9a8365;
   outline-offset: 2px;
@@ -384,7 +386,8 @@ textarea:focus-visible {
   font-weight: 650;
 }
 
-.field-label input {
+.field-label input,
+.field-label select {
   width: 100%;
   padding: 9px 10px;
   border: 1px solid #e3e2da;

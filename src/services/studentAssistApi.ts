@@ -9,6 +9,7 @@ export interface ChatRequest {
   question: string
   conversationId?: string
   documentId?: string
+  subject?: string
 }
 
 export interface ChatResult {
@@ -104,6 +105,7 @@ export async function chatWithAssistant(
       question: request.question,
       ...(request.conversationId ? { conversationId: request.conversationId } : {}),
       ...(request.documentId ? { documentId: request.documentId } : {}),
+      ...(request.subject ? { subject: request.subject } : {}),
     }),
     signal,
   }).catch((error: unknown) => {

@@ -18,7 +18,7 @@ export interface Conversation {
   id: string
   conversationId?: string
   title: string
-  subject: string
+  subject?: string
   documentId: string
   messages: ChatMessage[]
   updatedAt: number

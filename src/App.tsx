@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { chatWithAssistant } from './services/studentAssistApi'
+import { chatWithAssistant, type ChatRequest } from './services/studentAssistApi'
 import type { ChatMessage, Conversation } from './types/chat'
 import { ChatWindow } from './components/ChatWindow'
 import { ConversationSidebar } from './components/ConversationSidebar'
 import './App.css'
 
-function makeConversation(subject = 'math'): Conversation {
+function makeConversation(subject = ''): Conversation {
   return {
     id: crypto.randomUUID(),
     title: 'New conversation',
@@ -21,7 +21,6 @@ function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [sidebarError, setSidebarError] = useState<string | null>(null)
-  const [defaultSubject, setDefaultSubject] = useState('math')
   const activeRequest = useRef<AbortController | null>(null)
 
   const selectedConversation =
@@ -46,7 +45,7 @@ function App() {
   )
 
   const startConversation = () => {
-    const conversation = makeConversation(defaultSubject)
+    const conversation = makeConversation()
     activeRequest.current?.abort()
     activeRequest.current = null
     setLoading(false)
@@ -54,10 +53,15 @@ function App() {
     setSelectedId(conversation.id)
   }
 
-  const handleSend = async (question: string) => {
-    if (!selectedConversation || loading || !question.trim()) return
+  const handleSend = async (
+    conversationKey: string,
+    question: string,
+    subject: string,
+    documentId: string,
+  ) => {
+    const conversation = conversations.find((item) => item.id === conversationKey)
+    if (!conversation || loading || !question.trim()) return
 
-    const conversation = selectedConversation
     activeRequest.current?.abort()
     const userMessage: ChatMessage = {
       id: crypto.randomUUID(),
@@ -84,14 +88,18 @@ function App() {
     setLoading(true)
     setSidebarError(null)
     try {
-      const result = await chatWithAssistant(
-        {
-          question: question.trim(),
-          conversationId: conversation.conversationId,
-          documentId: conversation.documentId || undefined,
-        },
-        controller.signal,
-      )
+      const request: ChatRequest = { question: question.trim() }
+      if (conversation.conversationId) request.conversationId = conversation.conversationId
+      if (documentId) request.documentId = documentId
+      if (subject) request.subject = subject
+      const result = await chatWithAssistant(request, controller.signal)
+      if (controller.signal.aborted || activeRequest.current !== controller) {
+        updateConversation(conversation.id, (current) => ({
+          ...current,
+          messages: current.messages.filter((message) => message.id !== pendingId),
+        }))
+        return
+      }
       updateConversation(conversation.id, (current) => ({
         ...current,
         conversationId: result.conversationId ?? current.conversationId,
@@ -108,7 +116,7 @@ function App() {
         updatedAt: Date.now(),
       }))
     } catch (error) {
-      if (controller.signal.aborted) {
+      if (controller.signal.aborted || activeRequest.current !== controller) {
         updateConversation(conversation.id, (current) => ({
           ...current,
           messages: current.messages.filter((message) => message.id !== pendingId),
@@ -142,7 +150,12 @@ function App() {
         (message) => !(message.role === 'assistant' && message.status === 'error'),
       ),
     }))
-    void handleSend(question)
+    void handleSend(
+      selectedConversation.id,
+      question,
+      selectedConversation.subject ?? '',
+      selectedConversation.documentId,
+    )
   }
 
   const handleConversationUpdate = (
@@ -150,10 +163,12 @@ function App() {
     value: string,
   ) => {
     if (!selectedConversation) return
-    if (field === 'subject') setDefaultSubject(value)
     updateConversation(selectedConversation.id, (current) => ({
       ...current,
       [field]: value,
+      ...(field === 'documentId' && value !== current.documentId
+        ? { conversationId: undefined }
+        : {}),
     }))
   }
 
@@ -183,9 +198,12 @@ function App() {
         </header>
         {selectedConversation ? (
           <ChatWindow
+            key={selectedConversation.id}
             conversation={selectedConversation}
             busy={loading}
-            onSend={handleSend}
+            onSend={(question, subject, documentId) =>
+              void handleSend(selectedConversation.id, question, subject, documentId)
+            }
             onRetry={handleRetry}
             onSubjectChange={(value) => handleConversationUpdate('subject', value)}
             onDocumentChange={(value) => handleConversationUpdate('documentId', value)}
@@ -206,9 +224,7 @@ function App() {
                   <button
                     key={subject}
                     onClick={() => {
-                      setDefaultSubject(subject)
                       const conversation = makeConversation(subject)
-                      conversation.subject = subject
                       setConversations((current) => [conversation, ...current])
                       setSelectedId(conversation.id)
                     }}

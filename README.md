@@ -11,9 +11,11 @@ npm run dev
 
 ## GitHub Pages
 
-The `main` branch deploys automatically to
-`https://etw-bank.github.io/RirisagentFrontend/` using GitHub Actions. The
-workflow runs the tests, lint, and production build before publishing.
+The site is published at `https://etw-bank.github.io/RirisagentFrontend/`. The
+repository includes a GitHub Actions workflow that runs tests, lint, and the
+production build before deployment. GitHub currently reports that Actions jobs
+cannot start because of an account billing issue; until that is resolved, updates
+to the published `gh-pages` branch must be made manually.
 
 The StudentAssist API must allow the GitHub Pages origin
 `https://etw-bank.github.io` through CORS for browser chat requests to work. The

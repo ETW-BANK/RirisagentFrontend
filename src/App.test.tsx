@@ -107,7 +107,7 @@ describe('StudentAssist chat', () => {
     const secondAnswer = screen.getByText('Sets are collections of objects.')
     expect(secondAnswer.closest('.message-column')).not.toHaveTextContent('history.pdf')
     expect(secondAnswer.closest('.message-column')).not.toHaveTextContent('History passage.')
-    expect(screen.getByText('history.pdf')).toBeInTheDocument()
+    expect(screen.queryByText('history.pdf')).not.toBeInTheDocument()
   })
 
   it('clears the conversation ID when starting a new conversation', async () => {

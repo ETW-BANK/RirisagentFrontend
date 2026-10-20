@@ -51,7 +51,6 @@ textarea:focus-visible {
 }
 
 .brand-mark,
-.assistant-avatar,
 .user-avatar {
   display: grid;
   flex: 0 0 auto;
@@ -601,17 +600,11 @@ textarea:focus-visible {
   justify-content: flex-end;
 }
 
-.assistant-avatar,
 .user-avatar {
   width: 29px;
   height: 29px;
   border-radius: 10px;
   font-size: 11px;
-}
-
-.assistant-avatar {
-  color: #59644e;
-  background: #e7ebdf;
 }
 
 .user-avatar {
@@ -682,53 +675,6 @@ textarea:focus-visible {
   30% { opacity: 1; transform: translateY(-3px); }
 }
 
-.citation-list {
-  display: grid;
-  gap: 7px;
-  margin-top: 12px;
-}
-
-.citation-list h3 {
-  margin: 0;
-  color: #818479;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.citation-card {
-  padding: 9px 11px;
-  border: 1px solid #e8e7df;
-  border-radius: 8px;
-  background: #fdfdfa;
-}
-
-.citation-meta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 5px;
-  color: #6b705f;
-  font-size: 9px;
-  font-weight: 650;
-}
-
-.citation-page {
-  color: #8b8b80;
-  font-weight: 400;
-}
-
-.citation-card p {
-  margin-top: 6px;
-  color: #65665e;
-  font-size: 10px;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-}
-
-.copy-button,
 .retry-button {
   margin-top: 7px;
   padding: 3px 0;
@@ -738,7 +684,6 @@ textarea:focus-visible {
   font-size: 9px;
 }
 
-.copy-button:hover,
 .retry-button:hover {
   color: #404d36;
   text-decoration: underline;
